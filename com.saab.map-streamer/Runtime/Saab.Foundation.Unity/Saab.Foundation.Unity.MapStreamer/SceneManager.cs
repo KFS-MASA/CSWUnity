@@ -875,6 +875,8 @@ namespace Saab.Foundation.Unity.MapStreamer
         }
 
         // The LoadMap function takes an URL and loads the map into GizmoSDK native db
+        public static System.Func<string, Node> RuntimeMapFactory;
+
         public bool LoadMap(string mapURL)
         {
             NodeLock.WaitLockEdit();      // We assume we do all editing from main thread and to allow render we assume we edit in edit mode
@@ -896,7 +898,7 @@ namespace Saab.Foundation.Unity.MapStreamer
                     SerializeAdapter.AdapterError errorType = SerializeAdapter.AdapterError.NO_ERROR;
                     bool retry = false;
 
-                    node = DbManager.LoadDB(mapURL, ref errorString, ref errorType);
+                    node = RuntimeMapFactory?.Invoke(mapURL) ?? DbManager.LoadDB(mapURL, ref errorString, ref errorType);
 
                     if (node == null || !node.IsValid())
                     {
